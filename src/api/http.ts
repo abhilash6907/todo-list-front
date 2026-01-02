@@ -1,6 +1,8 @@
 import type { ApiErrorBody } from "../types";
 import { clearAuth, getAuthToken } from "../modules/auth/storage";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 export class ApiError extends Error {
   status: number;
   body?: ApiErrorBody;
@@ -39,7 +41,11 @@ export async function apiFetch<T>(
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(input, {
+  const url = typeof input === "string" && input.startsWith("/") 
+    ? `${API_BASE_URL}${input}` 
+    : input;
+
+  const res = await fetch(url, {
     ...init,
     headers: {
       ...headers
